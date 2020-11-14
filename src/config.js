@@ -38,9 +38,25 @@ const InquirerConfig = {
   }]
 }
 
+const typeMap = {
+  'page': '页面',
+  'component': '组件'
+}
+const InputFloderName = {
+  type: 'input',
+  name: 'floderName',
+  message: '请输入文件名'
+}
+function getInputFloderNameConfig(type) {
+  InputFloderName.message = `请输入${typeMap[type]}名`
+  return InputFloderName
+}
+
 const pcAdminRepo = 'github:chechengyi/antd-admin'
+
 
 module.exports = {
   InquirerConfig,
-  pcAdminRepo
+  pcAdminRepo,
+  getInputFloderNameConfig
 }

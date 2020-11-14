@@ -13,9 +13,9 @@ class Create {
     this.cmdDatas = parseCmdParams(desc)
     this.targetPath = this.getTargetPath(this.source)
     this.proInfo = {
-      type: 'pc-mobile',
+      type: 'pc-admin',
       MobileCssLoader: 'rem',
-      temp: path.join(__dirname, '../_temp_')
+      temp: __dirname
     };
     this.getTargetPath()
     this.spinner = ora()
@@ -26,8 +26,10 @@ class Create {
       await this.checkFloder()
       await this.chooseProjectType()
       await this.downloadRepo()
-      await this.copyFolderToTarget()
+      // await this.copyFolderToTarget()
       await this.updatePackageFile()
+      await this.writeConfig()
+      await this.copyTemplateForProject()
 
       log.success('项目初始化完成')
       log.success(`cd ${this.source}`)
@@ -101,7 +103,8 @@ class Create {
   downloadRepo(){
     this.spinner.start('正在拉取项目模板...')
     const repo = this.getRepoPath()
-    const { temp } = this.proInfo
+    // const { temp } = this.proInfo
+    let temp = this.targetPath
     return new Promise(async (resolve, reject)=> {
       await fs.removeSync(temp)
       download(repo, temp, async (err)=> {
@@ -155,6 +158,31 @@ class Create {
       default:
         return pcAdminRepo  
     }
+  }
+
+  async writeConfig(){
+    let configName
+    switch (this.proInfo.type) {
+      case 'pc-admin':
+        configName = 'pcAdminSettingConfig.json'
+        break
+      default:
+        configName = 'pcAdminSettingConfig.json'
+        break
+    }
+    const { temp } = this.proInfo
+    let tempPath = path.resolve(temp, configName)
+    let targetPath = path.resolve(this.targetPath,  './' + 'rcg.config.json')
+    await fs.copySync(tempPath, targetPath)
+    log.success('脚手架配置写入成功, rcg.config.json')
+  }
+
+  async copyTemplateForProject(){
+    const { temp } = this.proInfo
+    let tempPath = path.resolve(temp, 'template')
+    let targetPath = path.resolve(this.targetPath, './'+ 'template')
+    await fs.copySync(tempPath, targetPath)
+    log.success('脚手架模板写入成功, template')
   }
 
 }
